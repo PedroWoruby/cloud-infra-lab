@@ -1,0 +1,29 @@
+---
+- name: Atualizar cache do apt
+  ansible.builtin.apt:
+    update_cache: true
+    cache_valid_time: 3600
+
+- name: Instalar {{ webserver_package }}
+  ansible.builtin.apt:
+    name: "{{ webserver_package }}"
+    state: present
+
+- name: Publicar página inicial personalizada
+  ansible.builtin.template:
+    src: index.html.j2
+    dest: /var/www/html/index.html
+    mode: "0644"
+
+- name: Publicar configuração customizada do nginx
+  ansible.builtin.template:
+    src: nginx.conf.j2
+    dest: /etc/nginx/sites-available/default
+    mode: "0644"
+  notify: Recarregar nginx
+
+- name: Garantir que o nginx está em execução
+  ansible.builtin.command: nginx
+  args:
+    creates: /run/nginx.pid
+  changed_when: true

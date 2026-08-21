@@ -1,0 +1,25 @@
+---
+# playbook.yml — configura os "servidores" web do laboratório
+#
+# Uso:
+#   ansible-playbook playbook.yml
+#
+# A imagem ubuntu:22.04 não vem com Python instalado, então primeiro
+# usamos o módulo "raw" (que não depende de Python) pra instalá-lo,
+# e só depois coletamos os fatos do servidor normalmente.
+
+- name: Configurar servidores web do laboratório
+  hosts: webservers
+  gather_facts: false
+  become: false
+
+  pre_tasks:
+    - name: Instalar Python (necessário para os módulos do Ansible)
+      ansible.builtin.raw: apt-get update && apt-get install -y python3
+      changed_when: true
+
+    - name: Coletar fatos agora que o Python está disponível
+      ansible.builtin.setup:
+
+  roles:
+    - webserver

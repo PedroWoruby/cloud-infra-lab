@@ -1,0 +1,23 @@
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+
+scrape_configs:
+  - job_name: "prometheus"
+    static_configs:
+      - targets: ["localhost:9090"]
+
+  # Cada node-exporter roda na mesma network namespace do seu container
+  # web correspondente (network_mode: service:web-XX no docker-compose),
+  # por isso o alvo usa o nome do serviço web, não do node-exporter.
+  - job_name: "web-01"
+    static_configs:
+      - targets: ["web-01:9100"]
+        labels:
+          server: "web-01"
+
+  - job_name: "web-02"
+    static_configs:
+      - targets: ["web-02:9100"]
+        labels:
+          server: "web-02"

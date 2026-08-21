@@ -1,0 +1,6 @@
+# Coleção necessária para o Ansible conseguir "conectar" nos containers
+# Docker como se fossem servidores remotos (sem precisar de SSH).
+# Instale com: ansible-galaxy collection install -r requirements.yml
+collections:
+  - name: community.docker
+    version: ">=3.0.0"

@@ -1,0 +1,5 @@
+---
+# Variáveis padrão da role — sobrescrevíveis por host/grupo se necessário
+webserver_package: nginx
+webserver_port: 80
+webserver_environment: "dev"

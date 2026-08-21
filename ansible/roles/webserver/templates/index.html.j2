@@ -1,0 +1,13 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>{{ inventory_hostname }} — cloud-infra-lab</title>
+</head>
+<body style="font-family: sans-serif; margin: 4rem;">
+    <h1>Servidor: {{ inventory_hostname }}</h1>
+    <p>Ambiente: <strong>{{ webserver_environment }}</strong></p>
+    <p>Configurado via Ansible em {{ ansible_date_time.iso8601 }}</p>
+    <p>Este servidor faz parte do laboratório <code>cloud-infra-lab</code>.</p>
+</body>
+</html>

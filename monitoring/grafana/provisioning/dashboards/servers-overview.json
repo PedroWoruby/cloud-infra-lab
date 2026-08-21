@@ -1,0 +1,46 @@
+{
+  "title": "Cloud Infra Lab - Visão Geral dos Servidores",
+  "uid": "cloud-infra-lab-overview",
+  "timezone": "browser",
+  "schemaVersion": 39,
+  "version": 1,
+  "refresh": "10s",
+  "panels": [
+    {
+      "id": 1,
+      "title": "CPU em uso (%) por servidor",
+      "type": "timeseries",
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 0 },
+      "targets": [
+        {
+          "expr": "100 - (avg by (server) (rate(node_cpu_seconds_total{mode=\"idle\"}[1m])) * 100)",
+          "legendFormat": "{{server}}"
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "title": "Memória disponível (bytes) por servidor",
+      "type": "timeseries",
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 0 },
+      "targets": [
+        {
+          "expr": "node_memory_MemAvailable_bytes",
+          "legendFormat": "{{server}}"
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "title": "Servidores UP",
+      "type": "stat",
+      "gridPos": { "h": 6, "w": 12, "x": 0, "y": 8 },
+      "targets": [
+        {
+          "expr": "up{job=~\"web-.*\"}",
+          "legendFormat": "{{server}}"
+        }
+      ]
+    }
+  ]
+}

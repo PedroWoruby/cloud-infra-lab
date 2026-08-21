@@ -1,0 +1,14 @@
+# Copie este arquivo para terraform.tfvars e ajuste se quiser mudar os padrões
+# cp terraform.tfvars.example terraform.tfvars
+
+aws_region   = "us-east-1"
+project_name = "cloud-infra-lab"
+environment  = "dev"
+
+vpc_cidr              = "10.0.0.0/16"
+public_subnet_cidrs   = ["10.0.1.0/24", "10.0.2.0/24"]
+private_subnet_cidrs  = ["10.0.101.0/24", "10.0.102.0/24"]
+availability_zones    = ["us-east-1a", "us-east-1b"]
+
+# Em um cenário real, restrinja isso ao seu próprio IP: "SEU_IP/32"
+allowed_ssh_cidr = "0.0.0.0/0"

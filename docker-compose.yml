@@ -1,0 +1,103 @@
+##############################################################################
+# docker-compose.yml — sobe todo o laboratório localmente
+#
+# Serviços:
+#   localstack   -> simula a AWS (usada pelo Terraform em terraform/)
+#   web-01/web-02 -> "servidores" de aplicação, configurados via Ansible
+#   node-exporter-01/02 -> exportam métricas de cada "servidor" para o Prometheus
+#   prometheus   -> coleta as métricas
+#   grafana      -> visualiza as métricas em dashboards
+##############################################################################
+
+networks:
+  lab-net:
+    driver: bridge
+
+volumes:
+  grafana-data:
+
+services:
+  localstack:
+    image: localstack/localstack:3.0
+    container_name: localstack
+    ports:
+      - "4566:4566"  # Edge port: todas as APIs AWS simuladas passam por aqui
+    environment:
+      - SERVICES=ec2,s3,iam,sts,cloudwatch,logs
+      - DEBUG=0
+      - PERSISTENCE=1
+    volumes:
+      - "./data/localstack:/var/lib/localstack"
+      - "/var/run/docker.sock:/var/run/docker.sock"
+    networks:
+      - lab-net
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:4566/_localstack/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # ---------------------------------------------------------------------
+  # "Servidores" de aplicação — representam as instâncias que, em um
+  # cenário real, o Terraform teria provisionado na AWS. Aqui o Ansible
+  # entra para configurá-los, exatamente como faria via SSH em VMs reais.
+  # ---------------------------------------------------------------------
+  web-01:
+    image: ubuntu:22.04
+    container_name: web-01
+    command: sleep infinity
+    networks:
+      - lab-net
+    ports:
+      - "8081:80"
+
+  web-02:
+    image: ubuntu:22.04
+    container_name: web-02
+    command: sleep infinity
+    networks:
+      - lab-net
+    ports:
+      - "8082:80"
+
+  node-exporter-01:
+    image: prom/node-exporter:latest
+    container_name: node-exporter-01
+    pid: "host"
+    network_mode: "service:web-01"
+
+  node-exporter-02:
+    image: prom/node-exporter:latest
+    container_name: node-exporter-02
+    pid: "host"
+    network_mode: "service:web-02"
+
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: prometheus
+    volumes:
+      - "./monitoring/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro"
+    ports:
+      - "9090:9090"
+    networks:
+      - lab-net
+    depends_on:
+      - web-01
+      - web-02
+
+  grafana:
+    image: grafana/grafana:latest
+    container_name: grafana
+    environment:
+      - GF_SECURITY_ADMIN_USER=admin
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+      - GF_AUTH_ANONYMOUS_ENABLED=false
+    volumes:
+      - "grafana-data:/var/lib/grafana"
+      - "./monitoring/grafana/provisioning:/etc/grafana/provisioning:ro"
+    ports:
+      - "3000:3000"
+    networks:
+      - lab-net
+    depends_on:
+      - prometheus

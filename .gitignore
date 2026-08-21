@@ -1,0 +1,23 @@
+# Terraform
+terraform/.terraform/
+terraform/.terraform.lock.hcl
+terraform/terraform.tfstate
+terraform/terraform.tfstate.backup
+terraform/terraform.tfvars
+terraform/*.tfplan
+
+# LocalStack
+data/
+
+# Ansible
+ansible/*.retry
+ansible/collections/
+
+# Grafana
+monitoring/grafana/data/
+
+# OS / editores
+.DS_Store
+*.swp
+.vscode/
+.idea/
